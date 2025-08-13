@@ -1,49 +1,48 @@
 ####################################
-# Xcode i iOS – pliki tymczasowe i lokalne ustawienia
+# Xcode / iOS — pliki tymczasowe i lokalne ustawienia
 ####################################
-# Foldery kompilacji i dane pochodne (cache)
+.DS_Store
 build/
 DerivedData/
 
-# Pliki indywidualnych ustawień użytkownika (stan zakładek, otwarte pliki itp.)
+# Dane użytkownika i stan UI
 xcuserdata/
 *.xcuserstate
 *.xcuserdatad
 *.xccheckout
 *.xcscmblueprint
 
-# Ustawienia workspace – lokalne, niepotrzebne w repo
-*.xcworkspace/xcuserdata
+# Workspace — trzymaj shared schemes, ignoruj lokalne ustawienia
+*.xcworkspace/xcuserdata/
 *.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+!**/*.xcodeproj/xcshareddata/
+!**/*.xcworkspace/xcshareddata/
 
 ####################################
-# Swift Package Manager – pliki i katalogi generowane automatycznie
+# Swift Package Manager
 ####################################
 Packages/
-Package.pins
-Package.resolved
 .swiftpm/
 *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+# Zostaw blokadę wersji w repo
+!Package.resolved
 
 ####################################
-# CocoaPods – pliki zależności
+# CocoaPods
 ####################################
 Pods/
-Podfile.lock
+# Zostaw blokadę wersji w repo
+!Podfile.lock
 
 ####################################
-# Carthage – pliki binarne zależności
+# Carthage
 ####################################
 Carthage/Build/
+# (opcjonalnie) Zostaw blokadę wersji w repo
+!Cartfile.resolved
 
 ####################################
-# Accio dependency manager – cache i katalogi
-####################################
-Dependencies/
-.accio/
-
-####################################
-# Fastlane – raporty i pliki generowane
+# Fastlane — raporty i pliki generowane
 ####################################
 fastlane/report.xml
 fastlane/Preview.html
@@ -53,16 +52,16 @@ fastlane/test_output
 ####################################
 # Testy i raporty pokrycia kodu
 ####################################
-*.xcresult         # Wyniki testów Xcode
-*.xccovreport      # Raporty pokrycia
-*.xccovarchive     # Archiwa pokrycia
+*.xcresult
+*.xccovreport
+*.xccovarchive
 *.gcda
 *.gcno
 *.profraw
 *.profdata
 
 ####################################
-# Symulator i pliki urządzeń iOS
+# Symulator iOS
 ####################################
 *.simdevicetype
 *.simruntime
@@ -73,8 +72,8 @@ fastlane/test_output
 ####################################
 *.ipa
 *.app
-*.dSYM.zip
 *.dSYM
+*.dSYM.zip
 
 ####################################
 # Pliki tymczasowe i systemowe
@@ -83,14 +82,15 @@ fastlane/test_output
 *.swp
 *.swo
 *.tmp
-*.DS_Store
+*.orig
+*.rej
 
 ####################################
-# Specjalne dla projektu Cytaty3App
+# Specjalne dla Cytaty3App
 ####################################
 # Wyklucz raporty testów jednostkowych i UI
 Cytaty3AppTests/**/*.xcresult
 Cytaty3AppUITests/**/*.xcresult
 
-# Wyklucz śmieci w katalogu Assets.xcassets (np. pliki generowane automatycznie przez narzędzia)
+# Wyklucz śmieci w katalogu Assets.xcassets (np. pliki generowane automatycznie)
 Cytaty3App/Assets.xcassets/**/*.tmp
