@@ -5,52 +5,78 @@ struct SearchBooksView: View {
     let network: NetworkService
     let onPick: (BookSearchResult) -> Void
 
-    @State private var query = ""
-    @State private var results: [BookSearchResult] = []
-    @State private var isLoading = false
-    @State private var errorText: String?
+    @StateObject private var vm: SearchBooksViewModel
+
+    init(network: NetworkService, onPick: @escaping (BookSearchResult) -> Void) {
+        self.network = network
+        self.onPick = onPick
+        _vm = StateObject(wrappedValue: SearchBooksViewModel(network: network))
+    }
 
     var body: some View {
         NavigationStack {
             List {
-                if let err = errorText { Text(err).foregroundColor(.red) }
-                ForEach(results) { r in
+                if let err = vm.errorText, vm.results.isEmpty {
+                    Text(err).foregroundColor(.red)
+                }
+
+                ForEach(vm.results) { r in
                     Button {
                         onPick(r)
                     } label: {
                         VStack(alignment: .leading) {
                             Text(r.title).font(.headline)
                             Text(r.authors.joined(separator: ", "))
-                                .font(.subheadline).foregroundColor(.secondary)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .onAppear {
+                        // Auto-dociąganie gdy dojeżdżamy do końca listy
+                        if r.id == vm.results.last?.id {
+                            vm.loadMore()
                         }
                     }
                 }
+
+                // Wiersz paginacji: Pokaż więcej / Ładowanie… / Retry
+                if vm.hasMore || vm.isLoadingMore || (vm.errorText != nil && !vm.results.isEmpty) {
+                    HStack {
+                        if vm.isLoadingMore {
+                            ProgressView().padding(.trailing, 8)
+                            Text("Ładowanie...")
+                        } else if vm.errorText != nil {
+                            Button("Spróbuj ponownie") {
+                                vm.loadMore()
+                            }
+                        } else {
+                            Button("Pokaż więcej") {
+                                vm.loadMore()
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                }
             }
             .navigationTitle("Szukaj książek")
-            .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always))
-            .overlay { if isLoading { ProgressView().controlSize(.large) } }
-            .onChange(of: query) { _ in Task { await search() } }
+            .searchable(text: $vm.query, placement: .navigationBarDrawer(displayMode: .always))
+            .onChange(of: vm.query) { newValue in
+                vm.onQueryChange(newValue)
+            }
+            .overlay(alignment: .center) {
+                if vm.isLoadingFirstPage {
+                    ProgressView().controlSize(.large)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Zamknij") { onPick(.init(id: "", title: "", authors: [], publishYear: nil, isbn: nil, coverURL: nil)) }
-                        .opacity(0) // zamykamy przez wybór
+                    // zamknięcie realizowane przez wybór wyniku — przycisk ukryty
+                    Button("Zamknij") {
+                        onPick(.init(id: "", title: "", authors: [], publishYear: nil, isbn: nil, coverURL: nil))
+                    }
+                    .opacity(0)
                 }
             }
         }
-    }
-
-    private func search() async {
-        let trimmed = query.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty else { results = []; return }
-        isLoading = true
-        errorText = nil
-        do {
-            let res = try await network.searchBooks(query: trimmed)
-            if Task.isCancelled { return }
-            results = res
-        } catch {
-            errorText = "Błąd wyszukiwania: \(error.localizedDescription)"
-        }
-        isLoading = false
     }
 }

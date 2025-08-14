@@ -4,6 +4,7 @@ import UIKit
 public final class ImageCacheService: ImageCacheServiceProtocol {
     private let fm = FileManager.default
     private let cache = NSCache<NSString, UIImage>()
+
     private lazy var coversDir: URL = {
         let docs = fm.urls(for: .documentDirectory, in: .userDomainMask).first!
         let dir = docs.appendingPathComponent("BookCovers", isDirectory: true)
@@ -20,21 +21,23 @@ public final class ImageCacheService: ImageCacheServiceProtocol {
     }
 
     public func image(for urlString: String, cacheKey: String) async -> UIImage? {
+        // RAM
         if let mem = cachedImage(for: cacheKey) { return mem }
 
-        // jeśli istnieje plik na dysku pod tym kluczem
+        // Dysk
         let fileURL = coversDir.appendingPathComponent(cacheKey).appendingPathExtension("jpg")
         if let img = UIImage(contentsOfFile: fileURL.path) {
             cache.setObject(img, forKey: cacheKey as NSString)
             return img
         }
 
-        guard let url = URL(string: urlString) else { return nil }
+        // Sieć (z wymuszeniem HTTPS)
+        let sanitized = Self.enforceHTTPS(urlString)
+        guard let url = URL(string: sanitized) else { return nil }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             if let img = UIImage(data: data) {
                 cache.setObject(img, forKey: cacheKey as NSString)
-                // zapisz na dysku
                 if let jpg = img.jpegData(compressionQuality: 0.9) {
                     try? jpg.write(to: fileURL, options: .atomic)
                 }
@@ -54,7 +57,11 @@ public final class ImageCacheService: ImageCacheServiceProtocol {
             cache.setObject(image, forKey: filename as NSString)
             return filename
         } else {
-            throw NSError(domain: "ImageCacheService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Nie udało się zakodować JPEG"])
+            throw NSError(
+                domain: "ImageCacheService",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Nie udało się zakodować JPEG"]
+            )
         }
     }
 
@@ -66,5 +73,14 @@ public final class ImageCacheService: ImageCacheServiceProtocol {
             return img
         }
         return nil
+    }
+
+    private static func enforceHTTPS(_ urlString: String) -> String {
+        guard var comps = URLComponents(string: urlString) else { return urlString }
+        if comps.scheme?.lowercased() == "http" {
+            comps.scheme = "https"
+            return comps.string ?? urlString
+        }
+        return urlString
     }
 }

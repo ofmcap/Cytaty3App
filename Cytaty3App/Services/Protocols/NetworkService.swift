@@ -1,16 +1,15 @@
 // Services/Protocols/NetworkService.swift
 import Foundation
 
-public struct BookSearchResult: Identifiable, Equatable {
-    public let id: String
-    public let title: String
-    public let authors: [String]
-    public let publishYear: Int?
-    public let isbn: String?
-    public let coverURL: String?
+public protocol NetworkService {
+    // Paginowana wersja wyszukiwania (Google Books: startIndex, maxResults)
+    func searchBooks(query: String, startIndex: Int, maxResults: Int) async throws -> [BookSearchResult]
+    func cancelSearch()
 }
 
-public protocol NetworkService {
-    func searchBooks(query: String) async throws -> [BookSearchResult]
-    func cancelSearch()
+// Wygodna nakładka — zgodność wsteczna dla miejsc, które nie potrzebują paginacji
+public extension NetworkService {
+    func searchBooks(query: String) async throws -> [BookSearchResult] {
+        try await searchBooks(query: query, startIndex: 0, maxResults: 20)
+    }
 }
