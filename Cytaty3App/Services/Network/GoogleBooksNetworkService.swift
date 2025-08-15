@@ -11,72 +11,51 @@ public final class GoogleBooksNetworkService: NetworkService {
         self.session = session
     }
 
-    // Paginacja: startIndex / maxResults
-    public func searchBooks(query: String, startIndex: Int, maxResults: Int) async throws -> [BookSearchResult] {
-        // Anulujemy poprzednie wyszukiwanie tylko przy starcie nowego zapytania (pierwsza strona),
-        // aby nie przerywać ładowania kolejnych stron.
-        if startIndex == 0 {
-            searchTask?.cancel()
-        }
+    public func searchBooks(
+        query: String,
+        startIndex: Int,
+        maxResults: Int,
+        preferredLanguage: LanguagePreference
+    ) async throws -> [BookSearchResult] {
+
+        if startIndex == 0 { searchTask?.cancel() }
 
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !q.isEmpty else { return [] }
 
-        searchTask = Task {
-            // Debounce tylko dla pierwszej strony
-            if startIndex == 0 {
-                try await Task.sleep(nanoseconds: 300_000_000) // 300 ms
-            }
-            if Task.isCancelled { return [] }
-
+        func makeURL(lang: LanguagePreference) -> URL {
             var comps = URLComponents(string: "https://www.googleapis.com/books/v1/volumes")!
-            comps.queryItems = [
+            var items: [URLQueryItem] = [
                 .init(name: "q", value: titleAuthorQuery(from: q)),
                 .init(name: "printType", value: "books"),
                 .init(name: "maxResults", value: String(max(1, min(maxResults, 40)))),
                 .init(name: "startIndex", value: String(max(0, startIndex))),
                 .init(name: "key", value: apiKey)
             ]
-            let url = comps.url!
-            #if DEBUG
-            // print("GoogleBooks q=\(comps.percentEncodedQuery ?? "")")
-            #endif
-            let (data, _) = try await session.data(from: url)
+            if let langCode = lang.langRestrictValue {
+                items.append(.init(name: "langRestrict", value: langCode))
+            }
+            comps.queryItems = items
+            return comps.url!
+        }
 
-            struct APIResponse: Decodable {
-                struct Item: Decodable {
-                    struct VolumeInfo: Decodable {
-                        let title: String?
-                        let authors: [String]?
-                        let publishedDate: String?
-                        let industryIdentifiers: [Identifier]?
-                        let imageLinks: ImageLinks?
-                        struct Identifier: Decodable { let type: String; let identifier: String }
-                        struct ImageLinks: Decodable { let smallThumbnail: String?; let thumbnail: String? }
-                    }
-                    let id: String
-                    let volumeInfo: VolumeInfo
-                }
-                let items: [Item]?
+        searchTask = Task {
+            if startIndex == 0 {
+                try await Task.sleep(nanoseconds: 250_000_000) // 250 ms debounce
+            }
+            if Task.isCancelled { return [] }
+
+            // 1) Próba z preferowanym językiem
+            let (dataPreferred, _) = try await session.data(from: makeURL(lang: preferredLanguage))
+            let resultsPreferred = try Self.decodeResults(dataPreferred)
+
+            // 2) Fallback do Any tylko na pierwszej stronie i tylko, gdy brak wyników
+            if startIndex == 0, resultsPreferred.isEmpty, preferredLanguage != .any {
+                let (dataAny, _) = try await session.data(from: makeURL(lang: .any))
+                return try Self.decodeResults(dataAny)
             }
 
-            let resp = try JSONDecoder().decode(APIResponse.self, from: data)
-            let results: [BookSearchResult] = (resp.items ?? []).map { item in
-                let v = item.volumeInfo
-                let year = Self.parseYear(from: v.publishedDate)
-                let isbn = v.industryIdentifiers?.first(where: { $0.type.contains("ISBN") })?.identifier
-                let rawCover = v.imageLinks?.thumbnail ?? v.imageLinks?.smallThumbnail
-                let cover = Self.enforceHTTPS(rawCover)
-                return BookSearchResult(
-                    id: item.id,
-                    title: v.title ?? "Brak tytułu",
-                    authors: v.authors ?? [],
-                    publishYear: year,
-                    isbn: isbn,
-                    coverURL: cover
-                )
-            }
-            return results
+            return resultsPreferred
         }
 
         return try await searchTask!.value
@@ -85,6 +64,41 @@ public final class GoogleBooksNetworkService: NetworkService {
     public func cancelSearch() {
         searchTask?.cancel()
         searchTask = nil
+    }
+
+    private static func decodeResults(_ data: Data) throws -> [BookSearchResult] {
+        struct APIResponse: Decodable {
+            struct Item: Decodable {
+                struct VolumeInfo: Decodable {
+                    let title: String?
+                    let authors: [String]?
+                    let publishedDate: String?
+                    let industryIdentifiers: [Identifier]?
+                    let imageLinks: ImageLinks?
+                    struct Identifier: Decodable { let type: String; let identifier: String }
+                    struct ImageLinks: Decodable { let smallThumbnail: String?; let thumbnail: String? }
+                }
+                let id: String
+                let volumeInfo: VolumeInfo
+            }
+            let items: [Item]?
+        }
+        let resp = try JSONDecoder().decode(APIResponse.self, from: data)
+        return (resp.items ?? []).map { item in
+            let v = item.volumeInfo
+            let year = Self.parseYear(from: v.publishedDate)
+            let isbn = v.industryIdentifiers?.first(where: { $0.type.contains("ISBN") })?.identifier
+            let rawCover = v.imageLinks?.thumbnail ?? v.imageLinks?.smallThumbnail
+            let cover = Self.enforceHTTPS(rawCover)
+            return BookSearchResult(
+                id: item.id,
+                title: v.title ?? "Brak tytułu",
+                authors: v.authors ?? [],
+                publishYear: year,
+                isbn: isbn,
+                coverURL: cover
+            )
+        }
     }
 
     private static func parseYear(from publishedDate: String?) -> Int? {
@@ -102,7 +116,6 @@ public final class GoogleBooksNetworkService: NetworkService {
         return urlString
     }
 }
-
 // MARK: - Query Builder (tylko intitle/inauthor, bez OR)
 
 extension GoogleBooksNetworkService {

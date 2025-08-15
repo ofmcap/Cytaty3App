@@ -2,14 +2,35 @@
 import Foundation
 
 public protocol NetworkService {
-    // Paginowana wersja wyszukiwania (Google Books: startIndex, maxResults)
-    func searchBooks(query: String, startIndex: Int, maxResults: Int) async throws -> [BookSearchResult]
+    func searchBooks(
+        query: String,
+        startIndex: Int,
+        maxResults: Int,
+        preferredLanguage: LanguagePreference
+    ) async throws -> [BookSearchResult]
+
     func cancelSearch()
 }
 
-// Wygodna nakładka — zgodność wsteczna dla miejsc, które nie potrzebują paginacji
+// Backward compatibility + convenience overloads
 public extension NetworkService {
+    // Stara sygnatura (bez języka) – domyślnie Any
+    func searchBooks(query: String, startIndex: Int, maxResults: Int) async throws -> [BookSearchResult] {
+        try await searchBooks(
+            query: query,
+            startIndex: startIndex,
+            maxResults: maxResults,
+            preferredLanguage: .any
+        )
+    }
+
+    // Wygodna wersja „bez paginacji” – start 0, 20 wyników, język Any
     func searchBooks(query: String) async throws -> [BookSearchResult] {
-        try await searchBooks(query: query, startIndex: 0, maxResults: 20)
+        try await searchBooks(
+            query: query,
+            startIndex: 0,
+            maxResults: 20,
+            preferredLanguage: .any
+        )
     }
 }

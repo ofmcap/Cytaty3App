@@ -1,5 +1,5 @@
-// ViewModels/SearchBooksViewModel.swift
 import Foundation
+import SwiftUI
 
 @MainActor
 final class SearchBooksViewModel: ObservableObject {
@@ -12,11 +12,24 @@ final class SearchBooksViewModel: ObservableObject {
     @Published var isLoadingFirstPage = false
     @Published var isLoadingMore = false
 
+    // Preferencje językowe
+    @AppStorage("preferredLanguageCode") private var preferredLanguageCode: String = "" // "" = Any
+    @Published var preferredLanguage: LanguagePreference = .any
+
     private(set) var nextStartIndex: Int = 0
     private(set) var hasMore: Bool = false
 
     init(network: NetworkService) {
         self.network = network
+        preferredLanguage = preferredLanguageCode.isEmpty ? .any : .code(preferredLanguageCode)
+    }
+
+    func setPreferredLanguage(_ lang: LanguagePreference) {
+        preferredLanguage = lang
+        switch lang {
+        case .any: preferredLanguageCode = ""
+        case .code(let c): preferredLanguageCode = c.lowercased()
+        }
     }
 
     func onQueryChange(_ newValue: String) {
@@ -45,18 +58,20 @@ final class SearchBooksViewModel: ObservableObject {
         hasMore = false
 
         do {
-            let res = try await network.searchBooks(query: q, startIndex: 0, maxResults: pageSize)
+            let res = try await network.searchBooks(
+                query: q,
+                startIndex: 0,
+                maxResults: pageSize,
+                preferredLanguage: preferredLanguage
+            )
             if Task.isCancelled { return }
-            // Deduplikacja po id, zachowanie kolejności
             var seen = Set<String>()
             let unique = res.filter { seen.insert($0.id).inserted }
             results = unique
             nextStartIndex = results.count
             hasMore = res.count == pageSize
         } catch is CancellationError {
-            // ciche ignorowanie anulowań
         } catch let urlErr as URLError where urlErr.code == .cancelled {
-            // ciche ignorowanie anulowań z URLSession
         } catch {
             if results.isEmpty {
                 errorText = "Błąd wyszukiwania: \(error.localizedDescription)"
@@ -75,18 +90,20 @@ final class SearchBooksViewModel: ObservableObject {
 
         Task {
             do {
-                let more = try await network.searchBooks(query: q, startIndex: nextStartIndex, maxResults: pageSize)
+                let more = try await network.searchBooks(
+                    query: q,
+                    startIndex: nextStartIndex,
+                    maxResults: pageSize,
+                    preferredLanguage: preferredLanguage
+                )
                 if Task.isCancelled { return }
-                // Deduplikacja po id
                 let existing = Set(results.map { $0.id })
                 let filtered = more.filter { !existing.contains($0.id) }
                 results.append(contentsOf: filtered)
                 nextStartIndex += more.count
                 hasMore = more.count == pageSize
             } catch is CancellationError {
-                // ignorujemy
             } catch let urlErr as URLError where urlErr.code == .cancelled {
-                // ignorujemy anulowania z URLSession
             } catch {
                 errorText = "Nie udało się pobrać kolejnych wyników. Spróbuj ponownie."
             }

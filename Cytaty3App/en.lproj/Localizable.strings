@@ -1,0 +1,25 @@
+"SEARCH_TITLE" = "Search Books";
+"SEARCH_PLACEHOLDER" = "Search title or author";
+"SEARCH_START_TITLE" = "Start searching";
+"SEARCH_START_MESSAGE" = "Type a title or an author. Use the language selector to narrow results.";
+"NO_RESULTS_TITLE" = "No results";
+"NO_RESULTS_MESSAGE %@" = "No results for “%@”.";
+"LOADING" = "Loading...";
+"LOADING_MORE" = "Loading...";
+"SHOW_MORE" = "Show more";
+"RETRY" = "Retry";
+"CLOSE" = "Close";
+
+"LANG_PICKER_TITLE" = "Choose language";
+"LANG_SEARCH_PLACEHOLDER" = "Search language or code";
+"RECENT_LANGUAGES" = "Recently used";
+"ALL_LANGUAGES" = "All languages";
+"CLEAR_RECENTS" = "Clear recents";
+"LANG_ANY" = "Any";
+"LANGUAGE_CHIP_LABEL %@" = "Language: %@";
+"LANGUAGE_CHIP_HINT" = "Tap to change search language";
+
+"ERROR_GENERIC" = "An error occurred";
+"ERROR_LOAD_MORE" = "Failed to load more results. Please try again.";
+
+"LIBRARY_TITLE" = "Library";

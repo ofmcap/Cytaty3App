@@ -1,0 +1,25 @@
+"SEARCH_TITLE" = "Szukaj książek";
+"SEARCH_PLACEHOLDER" = "Szukaj tytułu lub autora";
+"SEARCH_START_TITLE" = "Zacznij wyszukiwać";
+"SEARCH_START_MESSAGE" = "Wpisz tytuł lub autora. Skorzystaj z selektora języka, aby zawęzić wyniki.";
+"NO_RESULTS_TITLE" = "Brak wyników";
+"NO_RESULTS_MESSAGE %@" = "Nie znaleziono wyników dla „%@”.";
+"LOADING" = "Wczytywanie...";
+"LOADING_MORE" = "Wczytywanie...";
+"SHOW_MORE" = "Pokaż więcej";
+"RETRY" = "Spróbuj ponownie";
+"CLOSE" = "Zamknij";
+
+"LANG_PICKER_TITLE" = "Wybierz język";
+"LANG_SEARCH_PLACEHOLDER" = "Szukaj języka lub kodu";
+"RECENT_LANGUAGES" = "Ostatnio używane";
+"ALL_LANGUAGES" = "Wszystkie języki";
+"CLEAR_RECENTS" = "Wyczyść listę ostatnich";
+"LANG_ANY" = "Dowolny";
+"LANGUAGE_CHIP_LABEL %@" = "Język: %@";
+"LANGUAGE_CHIP_HINT" = "Dotknij, aby zmienić język wyszukiwania";
+
+"ERROR_GENERIC" = "Wystąpił błąd";
+"ERROR_LOAD_MORE" = "Nie udało się pobrać kolejnych wyników. Spróbuj ponownie.";
+
+"LIBRARY_TITLE" = "Biblioteka";

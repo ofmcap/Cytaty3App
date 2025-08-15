@@ -50,7 +50,7 @@ struct LibraryView: View {
             }
             .onDelete(perform: viewModel.deleteBooks)
         }
-        .navigationTitle("Biblioteka")
+        .navigationTitle("LIBRARY_TITLE")
         .searchable(text: $viewModel.searchText)
         .onChange(of: viewModel.searchText) { _ in viewModel.apply() }
         .toolbar {
