@@ -38,14 +38,14 @@ struct LibraryView: View {
                 .contentShape(Rectangle())
                 .onTapGesture { router.goToBookDetail(book.id) }
                 .contextMenu {
-                    Button("Edytuj") {
-                        // TODO: Add/Edit Book in kolejnej iteracji (w tym PhotosPicker)
+                    Button(String(localized: "CONTEXT_EDIT")) {
+                        // TODO: Add/Edit Book w kolejnej iteracji
                     }
                     Button(role: .destructive) {
                         if let idx = viewModel.books.firstIndex(of: book) {
                             viewModel.deleteBooks(at: IndexSet(integer: idx))
                         }
-                    } label: { Text("Usuń") }
+                    } label: { Text("CONTEXT_DELETE") }
                 }
             }
             .onDelete(perform: viewModel.deleteBooks)
@@ -56,9 +56,9 @@ struct LibraryView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
-                    Button("Najnowsze najpierw") { viewModel.sortOption = .addedDesc; viewModel.apply() }
-                    Button("Tytuł A→Z") { viewModel.sortOption = .titleAsc; viewModel.apply() }
-                    Button("Autor A→Z") { viewModel.sortOption = .authorAsc; viewModel.apply() }
+                    Button(String(localized: "SORT_NEWEST_FIRST")) { viewModel.sortOption = .addedDesc; viewModel.apply() }
+                    Button(String(localized: "SORT_TITLE_ASC")) { viewModel.sortOption = .titleAsc; viewModel.apply() }
+                    Button(String(localized: "SORT_AUTHOR_ASC")) { viewModel.sortOption = .authorAsc; viewModel.apply() }
                 } label: {
                     Image(systemName: "arrow.up.arrow.down")
                 }
@@ -67,7 +67,7 @@ struct LibraryView: View {
                 Button {
                     isPresentingSearch = true
                 } label: { Image(systemName: "plus") }
-                .accessibilityLabel("Dodaj książkę")
+                .accessibilityLabel(Text("LIB_ADD_BOOK"))
             }
         }
         .sheet(isPresented: $isPresentingSearch) {
@@ -77,7 +77,7 @@ struct LibraryView: View {
                 guard !result.id.isEmpty else { return } // “Zamknij” fallback
                 let book = Book(
                     title: result.title,
-                    authors: result.authors.isEmpty ? ["Autor nieznany"] : result.authors,
+                    authors: result.authors.isEmpty ? [String(localized: "UNKNOWN_AUTHOR")] : result.authors,
                     publishYear: result.publishYear,
                     isbn: result.isbn,
                     coverURL: result.coverURL,

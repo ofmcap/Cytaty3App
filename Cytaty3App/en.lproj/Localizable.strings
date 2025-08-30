@@ -23,3 +23,33 @@
 "ERROR_LOAD_MORE" = "Failed to load more results. Please try again.";
 
 "LIBRARY_TITLE" = "Library";
+"SORT_NEWEST_FIRST" = "Newest first";
+"SORT_TITLE_ASC" = "Title A→Z";
+"SORT_AUTHOR_ASC" = "Author A→Z";
+"LIB_ADD_BOOK" = "Add a book";
+"UNKNOWN_AUTHOR" = "Unknown author";
+
+"QUOTE_CONTENT_LABEL" = "Quote";
+"QUOTE_PAGE_PLACEHOLDER" = "Page";
+"QUOTE_CHAPTER_PLACEHOLDER" = "Chapter";
+"QUOTE_TAGS_PLACEHOLDER" = "Tags (comma-separated)";
+"QUOTE_NOTE_PLACEHOLDER" = "Note (optional)";
+"QUOTE_TITLE_ADD" = "New quote";
+"QUOTE_TITLE_EDIT" = "Edit quote";
+"CANCEL" = "Cancel";
+"SAVE" = "Save";
+
+"PUBLISH_YEAR" = "Published:";
+"QUOTES_SECTION_TITLE" = "Quotes";
+"QUOTES_SORT_TITLE" = "Sort";
+"QUOTES_SORT_NEWEST" = "Newest";
+"QUOTES_SORT_OLDEST" = "Oldest";
+"QUOTES_SORT_PAGE_ASC" = "Page ascending";
+"QUOTES_SORT_PAGE_DESC" = "Page descending";
+"BOOK_DETAILS_TITLE" = "Details";
+"ADD_QUOTE" = "Add quote";
+
+"QUOTE_PAGE_SHORT" = "p.";
+"QUOTE_CHAPTER_SHORT" = "Ch:";
+"CONTEXT_EDIT" = "Edit";
+"CONTEXT_DELETE" = "Delete";

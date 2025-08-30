@@ -23,3 +23,33 @@
 "ERROR_LOAD_MORE" = "Nie udało się pobrać kolejnych wyników. Spróbuj ponownie.";
 
 "LIBRARY_TITLE" = "Biblioteka";
+"SORT_NEWEST_FIRST" = "Najnowsze najpierw";
+"SORT_TITLE_ASC" = "Tytuł A→Z";
+"SORT_AUTHOR_ASC" = "Autor A→Z";
+"LIB_ADD_BOOK" = "Dodaj książkę";
+"UNKNOWN_AUTHOR" = "Autor nieznany";
+
+"QUOTE_CONTENT_LABEL" = "Treść cytatu";
+"QUOTE_PAGE_PLACEHOLDER" = "Strona";
+"QUOTE_CHAPTER_PLACEHOLDER" = "Rozdział";
+"QUOTE_TAGS_PLACEHOLDER" = "Tagi (oddzielone przecinkami)";
+"QUOTE_NOTE_PLACEHOLDER" = "Notatka (opcjonalnie)";
+"QUOTE_TITLE_ADD" = "Nowy cytat";
+"QUOTE_TITLE_EDIT" = "Edytuj cytat";
+"CANCEL" = "Anuluj";
+"SAVE" = "Zapisz";
+
+"PUBLISH_YEAR" = "Rok wydania:";
+"QUOTES_SECTION_TITLE" = "Cytaty";
+"QUOTES_SORT_TITLE" = "Sortuj";
+"QUOTES_SORT_NEWEST" = "Najnowsze";
+"QUOTES_SORT_OLDEST" = "Najstarsze";
+"QUOTES_SORT_PAGE_ASC" = "Strona rosnąco";
+"QUOTES_SORT_PAGE_DESC" = "Strona malejąco";
+"BOOK_DETAILS_TITLE" = "Szczegóły";
+"ADD_QUOTE" = "Dodaj cytat";
+
+"QUOTE_PAGE_SHORT" = "s.";
+"QUOTE_CHAPTER_SHORT" = "Rozdz.:";
+"CONTEXT_EDIT" = "Edytuj";
+"CONTEXT_DELETE" = "Usuń";

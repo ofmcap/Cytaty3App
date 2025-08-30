@@ -21,19 +21,19 @@ struct BookDetailView: View {
                         Text(viewModel.book.authors.joined(separator: ", "))
                             .font(.subheadline).foregroundColor(.secondary)
                         if let year = viewModel.book.publishYear {
-                            Text("Rok wydania: \(year)")
+                            Text("\(String(localized: "PUBLISH_YEAR")) \(year)")
                                 .font(.footnote).foregroundColor(.secondary)
                         }
                     }
                     Spacer()
                 }
             }
-            Section(header: Text("Cytaty")) {
-                Picker("Sortuj", selection: $viewModel.quoteSort) {
-                    Text("Najnowsze").tag(BookDetailViewModel.QuoteSort.addedDesc)
-                    Text("Najstarsze").tag(BookDetailViewModel.QuoteSort.addedAsc)
-                    Text("Strona rosnąco").tag(BookDetailViewModel.QuoteSort.pageAsc)
-                    Text("Strona malejąco").tag(BookDetailViewModel.QuoteSort.pageDesc)
+            Section(header: Text("QUOTES_SECTION_TITLE")) {
+                Picker("QUOTES_SORT_TITLE", selection: $viewModel.quoteSort) {
+                    Text("QUOTES_SORT_NEWEST").tag(BookDetailViewModel.QuoteSort.addedDesc)
+                    Text("QUOTES_SORT_OLDEST").tag(BookDetailViewModel.QuoteSort.addedAsc)
+                    Text("QUOTES_SORT_PAGE_ASC").tag(BookDetailViewModel.QuoteSort.pageAsc)
+                    Text("QUOTES_SORT_PAGE_DESC").tag(BookDetailViewModel.QuoteSort.pageDesc)
                 }
                 .pickerStyle(.segmented)
                 .onChange(of: viewModel.quoteSort) { _ in viewModel.applySort() }
@@ -46,12 +46,13 @@ struct BookDetailView: View {
                 .onDelete(perform: viewModel.deleteQuotes)
             }
         }
-        .navigationTitle("Szczegóły")
+        .navigationTitle("BOOK_DETAILS_TITLE")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     modal.openAddQuote()
                 } label: { Image(systemName: "plus.bubble") }
+                .accessibilityLabel(Text("ADD_QUOTE"))
             }
         }
         .fullScreenCover(isPresented: $modal.isPresentingAddQuoteFullScreen) {

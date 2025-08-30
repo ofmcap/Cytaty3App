@@ -21,18 +21,18 @@ struct AddEditQuoteView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 12) {
-                Text("Treść cytatu").font(.subheadline).foregroundColor(.secondary)
+                Text("QUOTE_CONTENT_LABEL").font(.subheadline).foregroundColor(.secondary)
                 WrappedTextView(text: $vm.content)
                     .frame(minHeight: 200, maxHeight: 300)
 
                 HStack {
-                    TextField("Strona", text: $vm.page)
+                    TextField(String(localized: "QUOTE_PAGE_PLACEHOLDER"), text: $vm.page)
                         .keyboardType(.numberPad)
-                    TextField("Rozdział", text: $vm.chapter)
+                    TextField(String(localized: "QUOTE_CHAPTER_PLACEHOLDER"), text: $vm.chapter)
                 }
 
-                TextField("Tagi (oddzielone przecinkami)", text: $vm.tagsText)
-                TextField("Notatka (opcjonalnie)", text: $vm.note)
+                TextField(String(localized: "QUOTE_TAGS_PLACEHOLDER"), text: $vm.tagsText)
+                TextField(String(localized: "QUOTE_NOTE_PLACEHOLDER"), text: $vm.note)
 
                 Spacer()
             }
@@ -40,10 +40,10 @@ struct AddEditQuoteView: View {
             .navigationTitle(modeTitle)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Anuluj") { onComplete(nil) }
+                    Button(String(localized: "CANCEL")) { onComplete(nil) }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Zapisz") { onComplete(vm.buildQuote()) }
+                    Button(String(localized: "SAVE")) { onComplete(vm.buildQuote()) }
                         .disabled(vm.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
@@ -51,6 +51,9 @@ struct AddEditQuoteView: View {
     }
 
     private var modeTitle: String {
-        switch mode { case .add: return "Nowy cytat"; case .edit: return "Edytuj cytat" }
+        switch mode {
+        case .add: return String(localized: "QUOTE_TITLE_ADD")
+        case .edit: return String(localized: "QUOTE_TITLE_EDIT")
+        }
     }
 }
